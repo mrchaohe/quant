@@ -1,20 +1,29 @@
-from binance.spot import Spot
+import logging
+import time
 
-from binance.um_futures import UMFutures
+from data.future_api import WBClient
+
+logger = logging.getLogger(__name__)
 
 if __name__ == "__main__":
+    while True:
+       
+        wb = WBClient()
 
-    # client = Spot(key='J9ACx1qqQgwbpZkwSYeB9vT0s1k7NC2939vzXNbpIm5Cfq6vB4Cr0aQpXyqNOltF',
-    #                        secret='JFvz23HL4ZMCWFjUAIgbpNHwEKdmblNPr1mnNyWNoQeUvoI4xBCwrqw9zieSSExA')
-    # print(client.account())
-    # client.system_status()
-    # client.depth("ANCUSDT")
-    # client.new_order_test()
-    fu1 = UMFutures()
+        wb.start()
+        
+        sub_info = wb.sub_kline()
+        sub_info.extend(wb.sub_mark_price())
+        sub_info.extend(wb.sub_depth())
+        wb.sublive_subscribe(sub_info)
 
-    print(fu1.time())
-    print(fu1.exchange_info())
-
-    # fu2= CMFutures(key='J9ACx1qqQgwbpZkwSYeB9vT0s1k7NC2939vzXNbpIm5Cfq6vB4Cr0aQpXyqNOltF',
-    #                        secret='JFvz23HL4ZMCWFjUAIgbpNHwEKdmblNPr1mnNyWNoQeUvoI4xBCwrqw9zieSSExA')
-    fu1.klines()
+        while True:
+           
+            if wb.dead:
+                break 
+            logger.debug("wb.dead is %s"%wb.dead)
+            time.sleep(5)
+        wb.dead = False
+        logger.info("---------stop----------")
+        wb.close()
+        logger.info("---------end----------")
