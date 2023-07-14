@@ -1,26 +1,27 @@
 # RESTFUL APIS
+import os 
 
-# from binance.cm_futures import CMFutures
+from binance.cm_futures import CMFutures
 
-# cm_futures_client = CMFutures()
+cm_futures_client = CMFutures()
 
-# # get server time
-# print(cm_futures_client.time())
+# get server time
+print(cm_futures_client.time())
 
-# cm_futures_client = CMFutures(key='<api_key>', secret='<api_secret>')
+cm_futures_client = CMFutures(key=os.getenv("bn_key"), secret=os.getenv("bn_secret"), timeout=15)
 
-# # Get account information
-# print(cm_futures_client.account())
+# Get account information
+print(cm_futures_client.account())
 
-# # Post a new order
-# params = {
-#     'symbol': 'BTCUSDT',
-#     'side': 'SELL',
-#     'type': 'LIMIT',
-#     'timeInForce': 'GTC',
-#     'quantity': 0.002,
-#     'price': 59808
-# }
+# Post a new order
+params = {
+    'symbol': 'BTCUSDT',
+    'side': 'SELL',
+    'type': 'LIMIT',
+    'timeInForce': 'GTC',
+    'quantity': 0.002,
+    'price': 59808
+}
 
 # response = cm_futures_client.new_order(**params)
 # print(response)

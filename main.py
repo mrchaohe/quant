@@ -18,7 +18,6 @@ if __name__ == "__main__":
         wb.sublive_subscribe(sub_info)
 
         while True:
-           
             if wb.dead:
                 break 
             logger.debug("wb.dead is %s"%wb.dead)
