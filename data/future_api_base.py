@@ -9,7 +9,7 @@ from db.db import B_DB
 
 # 获取交易规则和交易对
 #/root/anaconda3/lib/python3.9/site-packages/binance/websocket/
-logging.basicConfig(level = logging.INFO,format = '%(asctime)s -%(filename)s- line:%(lineno)d - %(levelname)s - %(message)s')
+logging.basicConfig(level = logging.ERROR,format = '%(asctime)s -%(filename)s- line:%(lineno)d - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 
@@ -50,7 +50,14 @@ class WBClientBase():
         if message is not None:
             if message.get("data"):
                 message = message.get("data")
-            if message.get("e"):
+            if isinstance(message, list):
+                try:
+                    self.handler[message[0]['e']](message)
+                except KeyError:
+                    logger.error("keyErr")
+                    self.dead = True
+                    self.close()
+            elif message.get("e"):
                 try:
                     self.handler[message['e']](message)
                 except KeyError:

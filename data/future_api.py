@@ -6,7 +6,7 @@ import time
 from binance.websocket.um_futures.websocket_client import \
     UMFuturesWebsocketClient
 from db.db import B_DB
-from future_api_base import WBClientBase
+from .future_api_base import WBClientBase
 # 获取交易规则和交易对
 #/root/anaconda3/lib/python3.9/site-packages/binance/websocket/
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s -%(filename)s- line:%(lineno)d - %(levelname)s - %(message)s')
@@ -19,7 +19,7 @@ symbols = ['btcusdt', 'ethusdt',"bnbusdt", "fitusdt"]
 
 
 class WBClient(WBClientBase):
-    def __init__(self, symbol):
+    def __init__(self, symbol=None):
         super().__init__(symbol)
         self.mark_corn = []
         self.depth_corn = []
@@ -33,7 +33,11 @@ class WBClient(WBClientBase):
             "kline": self.kline_message_handler,
             "24hrTicker": self.all_ticker_handler,
             "depthUpdate": self.depth_message_handler,
-            "bookTicker": self.all_book_ticker_handler,  
+            "bookTicker": self.all_book_ticker_handler, 
+            "markPriceUpdate": self.all_mark_handler
+            
+            
+            
         }
 
     # 整体订阅
@@ -84,8 +88,8 @@ class WBClient(WBClientBase):
         
     def all_mark_handler(self, message):
         # 最新标记
-        self.mark_corn.append(message)
-        if len(self.mark_corn) <20:
+        self.mark_corn.extend(message)
+        if len(self.mark_corn) <500:
             return 
         logger.info("insert mark message")
         B_DB.all_mark_1s.insert_many(self.mark_corn)
@@ -93,8 +97,8 @@ class WBClient(WBClientBase):
 
     def all_ticker_handler(self, message):
         # 24小时完整ticker
-        self.ticker_corn.append(message)
-        if len(self.ticker_corn) <20:
+        self.ticker_corn.extend(message)
+        if len(self.ticker_corn) <500:
             return 
         logger.info("insert ticker message")
         B_DB.all_ticker_1s.insert_many(self.ticker_corn)
@@ -103,7 +107,7 @@ class WBClient(WBClientBase):
     def all_book_ticker_handler(self, message):
         # 最优单
         self.order_corn.append(message)
-        if len(self.order_corn) <20:
+        if len(self.order_corn) <5000:
             return 
         logger.info("insert order message")
         B_DB.all_order_24h.insert_many(self.order_corn)
@@ -124,7 +128,7 @@ class WBClient(WBClientBase):
         self.depth_corn.append(message)
         if len(self.depth_corn) < 500:
             return 
-        
+        logger.info("insert depth message")
         B_DB.depth_500ms.insert_many(self.depth_corn)
         self.depth_corn = []
 

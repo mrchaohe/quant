@@ -2,10 +2,11 @@
 import sys 
 import os
 
+from collections import OrderedDict
 # 将当前连接放到python搜索路径
-curPath = os.path.abspath(os.path.dirname(__file__))
-rootPath = os.path.split(curPath)[0]
-sys.path.append(rootPath)
+# curPath = os.path.abspath(os.path.dirname(__file__))
+# rootPath = os.path.split(curPath)[0]
+# sys.path.append(rootPath)
 
 from db.db import B_DB
 
@@ -28,7 +29,7 @@ def get_symbols():
         }
         
     )
-    sym = dict()
+    sym = OrderedDict()
     for ret in cur:
         for x in ret["symbols"]:
             if x["symbol"].endswith("USDT"):
